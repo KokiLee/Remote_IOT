@@ -26,7 +26,6 @@ config.dictConfig(config_json)
 logger = getLogger(__name__)
 
 # Initial the dht device, with data pin connected to:
-# change one-wire-gpio 18 to 26
 dhtDevice = adafruit_dht.DHT22(board.D26, use_pulseio=False)
 
 # you can pass DHT22 use_pulseio=False if you wouldn't like to use pulseio.
@@ -64,24 +63,3 @@ def get_humidity():
 if __name__ == "__main__":
     print(get_temperture())
     print(get_humidity())
-
-# while True:
-#     try:
-#         # Print the values to the serial port
-#         temperature_c = dhtDevice.temperature
-#         temperature_f = temperature_c * (9 / 5) + 32 # Convert Celesous to Fahrenheit
-#         humidity = dhtDevice.humidity
-#         print(
-#             f"Temp: {temperature_f:.1f} F / {temperature_c:.1f} C    Humidity: {humidity}% "
-#         )
-
-#     except RuntimeError as error:
-#         # Errors happen fairly often, DHT's are hard to read, just keep going
-#         print(error.args[0])
-#         time.sleep(2.0)
-#         continue
-#     except Exception as error:
-#         dhtDevice.exit()
-#         raise error
-
-#     time.sleep(2.0)
