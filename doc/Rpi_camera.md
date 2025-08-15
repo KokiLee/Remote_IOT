@@ -32,6 +32,15 @@ sudo apt update
 sudo apt install libcamera_apps
 ```
 
+## config.txt
+
+```bash
+sudo nano /boot/firmware/config.txt
+
+# 最後に以下を追加
+dtoverlay=imx219
+```
+
 ## Use Camera
 
 ```bash
