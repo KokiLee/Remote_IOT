@@ -91,3 +91,16 @@ if __name__ == "__main__":
     print(get_temperture())
     print(get_humidity())
 ```
+
+## 備考
+
+### 1-wireのPIN変更
+
+```bash
+sudo nano /boot/firmware/config.txt
+
+[all]
+dtoverlay=w1-gpio,gpiopin=20
+```
+
+変更したら再起動
