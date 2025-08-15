@@ -5,25 +5,15 @@
 # SPDX-License-Identifier: MIT
 
 import time
-
-import board
+from pathlib import Path
 
 import adafruit_dht
-import json
-import os
-from logging import getLogger, config
+import board
 
-# logger
-with open("loggerConfig/logConfig.json") as f:
-    config_json = json.load(f)
+from mod_logger import Logger
 
-script_name = os.path.splitext(os.path.basename(__file__))[0]
-
-# dynamic log-file name
-config_json["handlers"]["file"]["filename"] = f"log/{script_name}.log"
-
-config.dictConfig(config_json)
-logger = getLogger(__name__)
+logger_set = Logger("loggerConfig/logConfig.json", Path(__file__).stem)
+logger = logger_set.get_log()
 
 # Initial the dht device, with data pin connected to:
 dhtDevice = adafruit_dht.DHT22(board.D26, use_pulseio=False)
@@ -61,5 +51,16 @@ def get_humidity():
 
 
 if __name__ == "__main__":
-    print(get_temperture())
-    print(get_humidity())
+    try:
+        while True:
+            get_temperture()
+            get_humidity()
+
+            time.sleep(3)
+    except KeyboardInterrupt:
+        logger.info("Finish")
+    except Exception as error:
+        dhtDevice.exit()
+        raise error
+    finally:
+        dhtDevice.exit()

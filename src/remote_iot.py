@@ -37,37 +37,19 @@
 # cmd T1_trans_start   0x59 bus-write(ADR,cmd,n)
 #
 
-from adafruit_blinka import patch_system
-import smbus  # I2C enable in raspi Interface option
-import time
-from time import sleep
-
-# import commands
-import subprocess
-import os
-import sys
-import json
+from pathlib import Path
 
 import gpiozero as gpio
-from logging import getLogger, config
+import smbus  # I2C enable in raspi Interface option
+from adafruit_blinka import patch_system
 
-script_name = os.path.splitext(os.path.basename(__file__))[0]
+from mod_logger import Logger
 
-# logger
-with open("loggerConfig/logConfig.json") as f:
-    config_json = json.load(f)
-
-# dynamic log-file name
-config_json["handlers"]["file"]["filename"] = f"log/{script_name}.log"
-
-# Read the logger config
-config.dictConfig(config_json)
-
-# Get this file
-logger = getLogger(__name__)
+logger_set = Logger("loggerConfig/logConfig.json", Path(__file__).stem)
+logger = logger_set.get_log()
 
 
-# gpio をpull_upにする
+# gpio is set to pull_up
 gpio.Button(pin=4, pull_up=True)
 gpio.Button(pin=17, pull_up=True)
 gpio.Button(pin=27, pull_up=True)
@@ -237,7 +219,7 @@ class Remote_Command:
         bus.write_i2c_block_data(self.SLAVE_ADDRESS, self.T1_trans_start, [0])  # =
 
 
-memo_no = [0x00]
+memo_no = [0x01]
 filename = "ch" + str(memo_no[0]) + ".data"
 
 start_command = "command/aircon_cooler_start.data"
@@ -245,10 +227,13 @@ stop_command = "command/aircon_stop.data"
 temp_27_command = "command/aircon_temp_27.data"
 temp_29_command = "command/aircon_temp_29.data"
 
+turn_on_ceilinglight = "command/turn_on_ceilinglight.data"
+turn_off_ceilinglight = "command/turn_off_ceilinglight.data"
+
 
 remote_command = Remote_Command(SLAVE_ADDRESS)
 
-remote_command.read_command(filename, memo_no)
+# remote_command.read_command(filename, memo_no)
 
 # remote_command.trans_command(filename=temp_27_command)
 
@@ -258,6 +243,8 @@ if __name__ == "__main__":
     print("3 = set temp 27 celsius")
     print("4 = turn off aircon")
     print("5 = cancel")
+    print("6 = turn on ceilinglight")
+    print("7 = turn off ceilinglight")
     select_code = int(input())
 
     match select_code:
@@ -271,3 +258,7 @@ if __name__ == "__main__":
             remote_command.trans_command(filename=stop_command)
         case 5:
             print("Cancel")
+        case 6:
+            remote_command.trans_command(filename=turn_on_ceilinglight)
+        case 7:
+            remote_command.trans_command(filename=turn_off_ceilinglight)
