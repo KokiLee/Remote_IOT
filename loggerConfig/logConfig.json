@@ -16,11 +16,11 @@
         },
         "file":{
             "class": "logging.handlers.RotatingFileHandler",
-            "level": "DEBUG",
+            "level": "INFO",
             "formatter": "default",
             "filename": "log/app.log",
             "maxBytes": 5242880,
-            "backupCount": 5
+            "backupCount": 2
         }
     },
 
