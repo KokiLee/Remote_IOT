@@ -219,11 +219,12 @@ class Remote_Command:
         bus.write_i2c_block_data(self.SLAVE_ADDRESS, self.T1_trans_start, [0])  # =
 
 
-memo_no = [0x01]
+memo_no = [0x00]
 filename = "ch" + str(memo_no[0]) + ".data"
 
 start_command = "command/aircon_cooler_start.data"
 stop_command = "command/aircon_stop.data"
+temp_24_command = "command/aircon_temp_24.data"
 temp_27_command = "command/aircon_temp_27.data"
 temp_29_command = "command/aircon_temp_29.data"
 
@@ -237,6 +238,52 @@ remote_command = Remote_Command(SLAVE_ADDRESS)
 
 # remote_command.trans_command(filename=temp_27_command)
 
+
+def remote_control(ctrl_num: int):
+    """_summary_
+
+    Args:
+        ctrl_num (int): _description_
+        0 = cancel
+        1 = turn on aircon
+        2 = set temp 29 celsius
+        3 = set temp 27 celsius
+        4 = turn off aircon
+        5 = cancel
+        6 = turn on ceilinglight
+        7 = turn off ceilinglight
+        8 = set temp 24 celsius
+    """
+    start_command = "command/aircon_cooler_start.data"
+    stop_command = "command/aircon_stop.data"
+    temp_24_command = "command/aircon_temp_24.data"
+    temp_27_command = "command/aircon_temp_27.data"
+    temp_29_command = "command/aircon_temp_29.data"
+
+    turn_on_ceilinglight = "command/turn_on_ceilinglight.data"
+    turn_off_ceilinglight = "command/turn_off_ceilinglight.data"
+
+    match ctrl_num:
+        case 0:
+            print("Cancel")
+        case 1:
+            remote_command.trans_command(filename=start_command)
+        case 2:
+            remote_command.trans_command(filename=temp_29_command)
+        case 3:
+            remote_command.trans_command(filename=temp_27_command)
+        case 4:
+            remote_command.trans_command(filename=stop_command)
+        case 5:
+            print("Cancel")
+        case 6:
+            remote_command.trans_command(filename=turn_on_ceilinglight)
+        case 7:
+            remote_command.trans_command(filename=turn_off_ceilinglight)
+        case 8:
+            remote_command.trans_command(filename=temp_24_command)
+
+
 if __name__ == "__main__":
     print("1 = turn on aircon")
     print("2 = set temp 29 celsius")
@@ -245,6 +292,7 @@ if __name__ == "__main__":
     print("5 = cancel")
     print("6 = turn on ceilinglight")
     print("7 = turn off ceilinglight")
+    print("8 = set temp 24 celsius")
     select_code = int(input())
 
     match select_code:
@@ -262,3 +310,5 @@ if __name__ == "__main__":
             remote_command.trans_command(filename=turn_on_ceilinglight)
         case 7:
             remote_command.trans_command(filename=turn_off_ceilinglight)
+        case 8:
+            remote_command.trans_command(filename=temp_24_command)
