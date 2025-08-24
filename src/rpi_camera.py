@@ -21,6 +21,9 @@ config = picam2.create_still_configuration(
     main={"size": (640, 400), "format": "BGR888"}
 )
 
+cameras = picam2.global_camera_info()
+logger.info(f"Available cameras: {cameras}")
+
 picam2.configure(config)
 
 picam2.start()
@@ -30,7 +33,7 @@ def capture():
     try:
         image_array = picam2.capture_array()
         img = Image.fromarray(image_array)
-        img = img.transpose(method=Image.FLIP_TOP_BOTTOM)  # 上下反転
+        img = img.transpose(method=Image.FLIP_TOP_BOTTOM)  # upside down
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
