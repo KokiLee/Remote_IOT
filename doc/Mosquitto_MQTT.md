@@ -187,3 +187,9 @@ publishされたデータをサーバ側でsubscribe。
 ```bash
 mosquitto_sub -h <ドメイン> -p 8883 -t "topic" -u <username> -P <password> --cafile /etc/mosquitto/certs/root-ca.crt
 ```
+
+## 備考
+
+今回は、AWS EC2にMQTTBrokerを立てて、Raspberry Piからデータを送信。(温湿度データ)
+WEBサイトのFormからデータをPublish、Raspberry PiからデータをSubscribeして、データを取得して
+家電のON,OFFを制御する用途でMQTTを使用しました。
