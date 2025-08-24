@@ -4,7 +4,7 @@
 
 - ハードウェア
   - Raspberry Pi 4 Model B Rev 1.5(.venv)
-  - DHT22
+  - Raspberry Pi Camera Module V2
 
 ```bash
 cat /proc/device-tree/model
