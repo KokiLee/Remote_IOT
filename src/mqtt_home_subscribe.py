@@ -1,14 +1,11 @@
 # installed paho-mqtt
-import time
-from datetime import datetime
 from pathlib import Path
 
 from paho.mqtt import client as mqtt_client
 
 import mqtt_settings
-from get_temperture_humidity import get_humidity, get_temperture
 from mod_logger import Logger
-from remote_iot import remote_control
+from remote_ctrl import remote_control
 
 logger_set = Logger("loggerConfig/logConfig.json", Path(__file__).stem)
 logger = logger_set.get_log()
@@ -67,9 +64,9 @@ def on_message(client, userdata, msg):
 
 
 # subscribe
-def subscribe(client: mqtt_client):
+def subscribe(client: mqtt_client.Client):
 
-    client.subscribe(topic)
+    client.subscribe(topic, qos=1)
     client.on_message = on_message
 
 
