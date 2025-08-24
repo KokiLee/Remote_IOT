@@ -1,6 +1,5 @@
 # installed paho-mqtt
 import time
-from datetime import datetime
 from pathlib import Path
 
 from paho.mqtt import client as mqtt_client
@@ -88,31 +87,25 @@ def on_disconnect(client, userdata, rc, properties=None, *args):
     FLAG_EXIT = True
 
 
-def publish(client):
-    msg_count = 1
-
+def publish(client: mqtt_client.Client):
     while not FLAG_EXIT:
         msg_temp = get_temperture()
         msg_humid = get_humidity()
         msg_cpu_temp = get_cpu_temperture()
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H:%M:%S")
         if not msg_temp is None and not msg_humid is None:
             msg = f"{msg_temp},{msg_humid},{msg_cpu_temp}"
-            result = client.publish(topic, msg)
+            result = client.publish(topic, msg, qos=0)
         else:
             time.sleep(1)
             continue
-        # result: [0, 1]
+
         status = result[0]
 
         if status == 0:
             logger.info(f"Send Temp, Humid {msg} to topic {topic}")
         else:
             logger.info(f"Failed to send message to topic {topic}")
-        # msg_count += 1
-        # if msg_count > 5:
-        #     break
 
         time.sleep(5)
 
