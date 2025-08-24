@@ -41,7 +41,6 @@ from pathlib import Path
 
 import gpiozero as gpio
 import smbus  # I2C enable in raspi Interface option
-from adafruit_blinka import patch_system
 
 from mod_logger import Logger
 
