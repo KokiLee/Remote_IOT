@@ -30,6 +30,7 @@ picam2.start()
 
 
 def capture():
+    img = None
     try:
         image_array = picam2.capture_array()
         img = Image.fromarray(image_array)
@@ -46,6 +47,10 @@ def capture():
         logger.info(f"save photo: {file_path}")
     except Exception as e:
         logger.error(f"don't save photo: {e}")
+    finally:
+        if img:
+            del img
+        del image_array
 
 
 def get_current_date():
