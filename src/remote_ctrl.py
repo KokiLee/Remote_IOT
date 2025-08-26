@@ -37,6 +37,8 @@
 # cmd T1_trans_start   0x59 bus-write(ADR,cmd,n)
 #
 
+import threading
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import gpiozero as gpio
@@ -218,6 +220,23 @@ class Remote_Command:
         bus.write_i2c_block_data(self.SLAVE_ADDRESS, self.T1_trans_start, [0])  # =
 
 
+def exe_after_3_hours():
+    pass
+
+
+def start_timer():
+    start_time = datetime.now()
+    finish_time = start_time + timedelta(hours=3)
+    delay_seconds = (finish_time - start_time).total_seconds()
+
+    timer = threading.Timer(interval=delay_seconds, function=exe_after_3_hours)
+    timer.start()
+
+    logger.info(f"Remaining time(min): {(finish_time - datetime.now()) / 60}")
+
+    return timer
+
+
 memo_no = [0x00]
 filename = "ch" + str(memo_no[0]) + ".data"
 
@@ -252,6 +271,7 @@ def remote_control(ctrl_num: int):
         6 = turn on ceilinglight
         7 = turn off ceilinglight
         8 = set temp 24 celsius
+        9 = set turn off 3 hour
     """
     start_command = "command/aircon_cooler_start.data"
     stop_command = "command/aircon_stop.data"
@@ -281,6 +301,15 @@ def remote_control(ctrl_num: int):
             remote_command.trans_command(filename=turn_off_ceilinglight)
         case 8:
             remote_command.trans_command(filename=temp_24_command)
+
+    while ctrl_num == 9:
+        start_time = datetime.now()
+
+        finish_time = start_time + timedelta(hours=3)
+
+        if datetime.now() == finish_time:
+            remote_command.trans_command(filename=stop_command)
+            break
 
 
 if __name__ == "__main__":
