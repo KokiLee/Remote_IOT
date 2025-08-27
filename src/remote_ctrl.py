@@ -45,6 +45,7 @@ import gpiozero as gpio
 import smbus  # I2C enable in raspi Interface option
 
 from mod_logger import Logger
+from mqtt_home_publish import publish_command
 
 logger_set = Logger("loggerConfig/logConfig.json", Path(__file__).stem)
 logger = logger_set.get_log()
@@ -218,7 +219,7 @@ class Remote_Command:
 
 
 def exe_after_3_hours():
-    pass
+    publish_command(topic="home/device/command", payload=10, qos=1)
 
 
 def start_timer():
@@ -298,15 +299,8 @@ def remote_control(ctrl_num: int):
             remote_command.trans_command(filename=turn_off_ceilinglight)
         case 8:
             remote_command.trans_command(filename=temp_24_command)
-
-    while ctrl_num == 9:
-        start_time = datetime.now()
-
-        finish_time = start_time + timedelta(hours=3)
-
-        if datetime.now() == finish_time:
-            remote_command.trans_command(filename=stop_command)
-            break
+        case 9:
+            start_timer()
 
 
 if __name__ == "__main__":
