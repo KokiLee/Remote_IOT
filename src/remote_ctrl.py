@@ -145,9 +145,7 @@ class Remote_Command:
         self.str_block = ""
 
         with open(filename, "r") as f:
-            f = open(filename, "r")
-
-        self.str_block = f.read()
+            self.str_block = f.read()
 
         logger.debug(f"Write the File Code= {self.str_block}")
         logger.debug(f"Number of characters= {len(self.str_block)}")
@@ -186,9 +184,8 @@ class Remote_Command:
         self.str_block = ""
 
         with open(filename, "r") as f:
-            f = open(filename, "r")
+            self.str_block = f.read()
 
-        self.str_block = f.read()
         logger.debug(f"{filename} = {self.str_block}")
         logger.debug(f"{filename} length = {len(self.str_block)}")
         str_tmp = ""
