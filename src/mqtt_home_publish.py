@@ -110,20 +110,6 @@ def publish(client: mqtt_client.Client):
         time.sleep(5)
 
 
-def publish_command(topic, payload):
-    client = connect_mqtt()
-    client.loop_start()
-
-    res = client.publish(topic=topic, payload=payload, qos=1)
-    logger.info(f"publish topic & message: {topic}, {payload}")
-
-    res.wait_for_publish()
-
-    if res.is_published():
-        client.disconnect()
-        logger.info("Disconnected")
-
-
 def run():
     client = connect_mqtt()
     client.loop_start()
