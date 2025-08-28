@@ -45,7 +45,7 @@ import gpiozero as gpio
 import smbus  # I2C enable in raspi Interface option
 
 from mod_logger import Logger
-from mqtt_home_publish import publish_command
+from mqtt_publish_response import publish_command
 
 logger_set = Logger("loggerConfig/logConfig.json", Path(__file__).stem)
 logger = logger_set.get_log()
@@ -304,6 +304,7 @@ def remote_control(ctrl_num: int):
 
 
 if __name__ == "__main__":
+    exe_after_3_hours()
     print("1 = turn on aircon")
     print("2 = set temp 29 celsius")
     print("3 = set temp 27 celsius")
@@ -312,22 +313,22 @@ if __name__ == "__main__":
     print("6 = turn on ceilinglight")
     print("7 = turn off ceilinglight")
     print("8 = set temp 24 celsius")
-    select_code = int(input())
+    # select_code = int(input())
 
-    match select_code:
-        case 1:
-            remote_command.trans_command(filename=start_command)
-        case 2:
-            remote_command.trans_command(filename=temp_29_command)
-        case 3:
-            remote_command.trans_command(filename=temp_27_command)
-        case 4:
-            remote_command.trans_command(filename=stop_command)
-        case 5:
-            print("Cancel")
-        case 6:
-            remote_command.trans_command(filename=turn_on_ceilinglight)
-        case 7:
-            remote_command.trans_command(filename=turn_off_ceilinglight)
-        case 8:
-            remote_command.trans_command(filename=temp_24_command)
+    # match select_code:
+    #     case 1:
+    #         remote_command.trans_command(filename=start_command)
+    #     case 2:
+    #         remote_command.trans_command(filename=temp_29_command)
+    #     case 3:
+    #         remote_command.trans_command(filename=temp_27_command)
+    #     case 4:
+    #         remote_command.trans_command(filename=stop_command)
+    #     case 5:
+    #         print("Cancel")
+    #     case 6:
+    #         remote_command.trans_command(filename=turn_on_ceilinglight)
+    #     case 7:
+    #         remote_command.trans_command(filename=turn_off_ceilinglight)
+    #     case 8:
+    #         remote_command.trans_command(filename=temp_24_command)
