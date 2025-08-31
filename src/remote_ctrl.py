@@ -303,6 +303,8 @@ def remote_control(ctrl_num: int):
             remote_command.trans_command(filename=temp_24_command)
         case 9:
             start_timer()
+        case 10:
+            remote_command.trans_command(filename=stop_command)
 
 
 if __name__ == "__main__":
