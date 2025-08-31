@@ -232,8 +232,6 @@ def start_timer():
 
 
 def exe_after_3_hours():
-    stop_command = "command/aircon_stop.data"
-    remote_command.trans_command(filename=stop_command)
     publish_command(topic="home/device/command", payload=10, qos=1)
 
 
