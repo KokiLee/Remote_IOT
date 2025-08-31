@@ -218,10 +218,6 @@ class Remote_Command:
         bus.write_i2c_block_data(self.SLAVE_ADDRESS, self.T1_trans_start, [0])  # =
 
 
-def exe_after_3_hours():
-    publish_command(topic="home/device/command", payload=10, qos=1)
-
-
 def start_timer():
     start_time = datetime.now()
     finish_time = start_time + timedelta(hours=3)
@@ -233,6 +229,12 @@ def start_timer():
     logger.info(f"Remaining time(min): {(finish_time - datetime.now()) / 60}")
 
     return timer
+
+
+def exe_after_3_hours():
+    stop_command = "command/aircon_stop.data"
+    remote_command.trans_command(filename=stop_command)
+    publish_command(topic="home/device/command", payload=10, qos=1)
 
 
 memo_no = [0x00]
@@ -304,7 +306,6 @@ def remote_control(ctrl_num: int):
 
 
 if __name__ == "__main__":
-    exe_after_3_hours()
     print("1 = turn on aircon")
     print("2 = set temp 29 celsius")
     print("3 = set temp 27 celsius")
@@ -313,22 +314,22 @@ if __name__ == "__main__":
     print("6 = turn on ceilinglight")
     print("7 = turn off ceilinglight")
     print("8 = set temp 24 celsius")
-    # select_code = int(input())
+    select_code = int(input())
 
-    # match select_code:
-    #     case 1:
-    #         remote_command.trans_command(filename=start_command)
-    #     case 2:
-    #         remote_command.trans_command(filename=temp_29_command)
-    #     case 3:
-    #         remote_command.trans_command(filename=temp_27_command)
-    #     case 4:
-    #         remote_command.trans_command(filename=stop_command)
-    #     case 5:
-    #         print("Cancel")
-    #     case 6:
-    #         remote_command.trans_command(filename=turn_on_ceilinglight)
-    #     case 7:
-    #         remote_command.trans_command(filename=turn_off_ceilinglight)
-    #     case 8:
-    #         remote_command.trans_command(filename=temp_24_command)
+    match select_code:
+        case 1:
+            remote_command.trans_command(filename=start_command)
+        case 2:
+            remote_command.trans_command(filename=temp_29_command)
+        case 3:
+            remote_command.trans_command(filename=temp_27_command)
+        case 4:
+            remote_command.trans_command(filename=stop_command)
+        case 5:
+            print("Cancel")
+        case 6:
+            remote_command.trans_command(filename=turn_on_ceilinglight)
+        case 7:
+            remote_command.trans_command(filename=turn_off_ceilinglight)
+        case 8:
+            remote_command.trans_command(filename=temp_24_command)
