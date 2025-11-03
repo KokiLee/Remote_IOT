@@ -351,7 +351,7 @@ if __name__ == "__main__":
         case 8:
             remote_command.trans_command(filename=temp_24_command)
         case 9:
-            start_timer()
+            start_timer(3, 4)
         case 10:
             remote_command.trans_command(filename=stop_command)
         case 11:
