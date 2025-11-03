@@ -23,11 +23,17 @@ dhtDevice = adafruit_dht.DHT22(board.D26, use_pulseio=False)
 # but it will not work in CircuitPython.
 # dhtDevice = adafruit_dht.DHT22(board.D18, use_pulseio=False)
 
+previous_temp = 0.0
+
 
 def get_temperture():
+    global previous_temp
     try:
         temperature_c = dhtDevice.temperature
         logger.info(f"Celsius = {temperature_c}")
+        if temperature_c > previous_temp + 10.0 and previous_temp != 0.0:
+            temperature_c = previous_temp
+        previous_temp = temperature_c
         return temperature_c
     except RuntimeError as e:
         logger.error(e.args[0])
