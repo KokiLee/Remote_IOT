@@ -218,12 +218,14 @@ class Remote_Command:
         bus.write_i2c_block_data(self.SLAVE_ADDRESS, self.T1_trans_start, [0])  # =
 
 
-def start_timer():
+def start_timer(hours: int, payload: int):
     start_time = datetime.now()
-    finish_time = start_time + timedelta(hours=3)
+    finish_time = start_time + timedelta(hours=hours)
     delay_seconds = (finish_time - start_time).total_seconds()
 
-    timer = threading.Timer(interval=delay_seconds, function=exe_after_3_hours)
+    timer = threading.Timer(
+        interval=delay_seconds, function=exe_after_3_hours, args=(payload,)
+    )
     timer.start()
 
     logger.info(f"Remaining time(min): {(finish_time - datetime.now()) / 60}")
@@ -231,8 +233,8 @@ def start_timer():
     return timer
 
 
-def exe_after_3_hours():
-    publish_command(topic="home/device/command", payload=10, qos=1)
+def exe_after_3_hours(payload: int):
+    publish_command(topic="home/device/command", payload=payload, qos=1)
 
 
 memo_no = [0x00]
@@ -247,12 +249,17 @@ temp_29_command = "command/aircon_temp_29.data"
 turn_on_ceilinglight = "command/turn_on_ceilinglight.data"
 turn_off_ceilinglight = "command/turn_off_ceilinglight.data"
 
+aircon_heater_24 = "command/aircon_heater_24.data"
+turn_on_bedroom_ceilinghlight = "command/turn_on_bedroom_ceilinglight.data"
+turn_off_bedroom_ceilinghlight = "command/turn_off_bedroom_ceilinglight.data"
 
 remote_command = Remote_Command(SLAVE_ADDRESS)
 
 # remote_command.read_command(filename, memo_no)
 
-# remote_command.trans_command(filename=temp_27_command)
+# remote_command.read_command(filename, memo_no)
+
+# remote_command.trans_command(filename=turn_off_bedroom_ceilinghlight)
 
 
 def remote_control(ctrl_num: int):
@@ -277,8 +284,8 @@ def remote_control(ctrl_num: int):
     temp_27_command = "command/aircon_temp_27.data"
     temp_29_command = "command/aircon_temp_29.data"
 
-    turn_on_ceilinglight = "command/turn_on_ceilinglight.data"
-    turn_off_ceilinglight = "command/turn_off_ceilinglight.data"
+    turn_on_bedroom_ceilinglight = "command/turn_on_bedroom_ceilinglight.data"
+    turn_off_bedroom_ceilinglight = "command/turn_off_bedroom_ceilinglight.data"
 
     match ctrl_num:
         case 0:
@@ -300,9 +307,19 @@ def remote_control(ctrl_num: int):
         case 8:
             remote_command.trans_command(filename=temp_24_command)
         case 9:
-            start_timer()
+            start_timer(3, 10)
         case 10:
             remote_command.trans_command(filename=stop_command)
+        case 11:
+            remote_command.trans_command(filename=aircon_heater_24)
+        case 12:
+            remote_command.trans_command(filename=turn_on_bedroom_ceilinglight)
+        case 13:
+            remote_command.trans_command(filename=turn_off_bedroom_ceilinglight)
+        case 14:
+            start_timer(5, 12)
+        case 15:
+            start_timer(4, 11)
 
 
 if __name__ == "__main__":
@@ -333,3 +350,13 @@ if __name__ == "__main__":
             remote_command.trans_command(filename=turn_off_ceilinglight)
         case 8:
             remote_command.trans_command(filename=temp_24_command)
+        case 9:
+            start_timer(3, 4)
+        case 10:
+            remote_command.trans_command(filename=stop_command)
+        case 11:
+            remote_command.trans_command(filename=aircon_heater_24)
+        case 12:
+            remote_command.trans_command(filename=turn_on_ceilinglight)
+        case 13:
+            remote_command.trans_command(filename=turn_off_ceilinglight)
