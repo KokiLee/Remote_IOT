@@ -31,8 +31,6 @@ def get_temperture():
     try:
         temperature_c = dhtDevice.temperature
         logger.info(f"Celsius = {temperature_c}")
-        if temperature_c > previous_temp + 10.0 and previous_temp != 0.0:
-            temperature_c = previous_temp
         previous_temp = temperature_c
         return temperature_c
     except RuntimeError as e:
