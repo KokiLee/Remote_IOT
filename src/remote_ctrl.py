@@ -50,6 +50,10 @@ from mqtt_publish_response import publish_command
 logger_set = Logger("loggerConfig/logConfig.json", Path(__file__).stem)
 logger = logger_set.get_log()
 
+# 2026-05-06: systemd など別の作業ディレクトリから実行しても command/*.data を読めるようにする。
+BASE_DIR = Path(__file__).parent.parent
+COMMAND_DIR = BASE_DIR / "command"
+
 
 # gpio is set to pull_up
 gpio.Button(pin=4, pull_up=True)
@@ -183,6 +187,13 @@ class Remote_Command:
         """
 
         self.str_block = ""
+        filename = Path(filename)
+        if not filename.is_absolute():
+            # 2026-05-06: 既存の相対パス指定も受け取り、プロジェクトルート基準の絶対パスに直す。
+            filename = BASE_DIR / filename
+
+        # 2026-05-06: MQTT 経由の操作で、どの赤外線データを送ったかログから追えるようにする。
+        logger.info(f"Transmit command file: {filename}")
 
         with open(filename, "r") as f:
             self.str_block = f.read()
@@ -216,6 +227,8 @@ class Remote_Command:
         # cmd T1_trans_start             0x59 bus-write(ADR,cmd,1)
         # memo_no = [0x00]  # for dummy
         bus.write_i2c_block_data(self.SLAVE_ADDRESS, self.T1_trans_start, [0])  # =
+        # 2026-05-06: ここまで到達すれば I2C 書き込みと送信開始コマンドは例外なく完了している。
+        logger.info(f"Transmit command complete: {filename}")
 
 
 def start_timer(hours: int, payload: int):
@@ -229,6 +242,38 @@ def start_timer(hours: int, payload: int):
     timer.start()
 
     logger.info(f"Remaining time(min): {(finish_time - datetime.now()) / 60}")
+
+    return timer
+
+
+# I'll make global variant "_active_timer". save current timer and cansel old timer.
+_active_timer = None
+
+
+def start_timer_new(hours: int, payload: int):
+    global _active_timer
+
+    if _active_timer is not None:
+        _active_timer.cancel()
+        logger.info("Previous timer canselled")
+
+    start_time = datetime.now()
+
+    today_5am = start_time.replace(hour=hours, minute=0, second=0, microsecond=0)
+    next_5am = today_5am + timedelta(days=1) if start_time >= today_5am else today_5am
+
+    finish_time = next_5am - start_time
+    delay_seconds = (finish_time).total_seconds()
+
+    timer = threading.Timer(
+        interval=delay_seconds, function=exe_after_3_hours, args=(payload,)
+    )
+
+    timer.start()
+    _active_timer = timer
+
+    logger.info(f"Remaining time(min): {finish_time.total_seconds() / 60}")
+    logger.info(f"Finish time: {finish_time}")
 
     return timer
 
@@ -278,18 +323,22 @@ def remote_control(ctrl_num: int):
         8 = set temp 24 celsius
         9 = set turn off 3 hour
     """
-    start_command = "command/aircon_cooler_start.data"
-    stop_command = "command/aircon_stop.data"
-    temp_24_command = "command/aircon_temp_24.data"
-    temp_27_command = "command/aircon_temp_27.data"
-    temp_29_command = "command/aircon_temp_29.data"
+    # 2026-05-06: command ファイルは実行ディレクトリに依存させず、プロジェクト内の command/ を参照する。
+    start_command = COMMAND_DIR / "aircon_cooler_start.data"
+    stop_command = COMMAND_DIR / "aircon_stop.data"
+    temp_24_command = COMMAND_DIR / "aircon_temp_24.data"
+    temp_27_command = COMMAND_DIR / "aircon_temp_27.data"
+    temp_29_command = COMMAND_DIR / "aircon_temp_29.data"
 
-    turn_on_bedroom_ceilinglight = "command/turn_on_bedroom_ceilinglight.data"
-    turn_off_bedroom_ceilinglight = "command/turn_off_bedroom_ceilinglight.data"
+    turn_on_bedroom_ceilinglight = COMMAND_DIR / "turn_on_bedroom_ceilinglight.data"
+    turn_off_bedroom_ceilinglight = COMMAND_DIR / "turn_off_bedroom_ceilinglight.data"
+
+    # 2026-05-06: 受信した MQTT payload がどの制御番号として処理されたかログに残す。
+    logger.info(f"Remote control command received: ctrl_num={ctrl_num}")
 
     match ctrl_num:
         case 0:
-            print("Cancel")
+            logger.info("Cancel")
         case 1:
             remote_command.trans_command(filename=start_command)
         case 2:
@@ -299,7 +348,7 @@ def remote_control(ctrl_num: int):
         case 4:
             remote_command.trans_command(filename=stop_command)
         case 5:
-            print("Cancel")
+            logger.info("Cancel")
         case 6:
             remote_command.trans_command(filename=turn_on_ceilinglight)
         case 7:
@@ -317,9 +366,12 @@ def remote_control(ctrl_num: int):
         case 13:
             remote_command.trans_command(filename=turn_off_bedroom_ceilinglight)
         case 14:
-            start_timer(5, 12)
+            start_timer_new(5, 12)
         case 15:
-            start_timer(4, 11)
+            start_timer_new(4, 11)
+        case _:
+            # 2026-05-06: 定義外の番号は無視し、誤った payload をログで確認できるようにする。
+            logger.warning(f"Unknown remote control command: ctrl_num={ctrl_num}")
 
 
 if __name__ == "__main__":
